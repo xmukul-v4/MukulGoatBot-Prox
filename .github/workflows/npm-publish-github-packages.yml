@@ -1,11 +1,14 @@
 
-name: Goat Bot V2
+name: Publish Node.js Package
 
 on:
+  release:
+    types: [published]
   workflow_dispatch:
-  push:
-    branches:
-      - main
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   build:
@@ -18,10 +21,13 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 20
+          registry-url: https://npm.pkg.github.com
 
       - name: Install Dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Check Project
-        run: node --check index.js
+      - name: Publish Package
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
